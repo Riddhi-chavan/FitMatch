@@ -1,0 +1,36 @@
+@import "tailwindcss";
+
+:root {
+  --ink: #0E0E0E;
+  --paper: #F6F3EE;
+  --linen: #E8E2D8;
+  --graphite: #5C5852;
+  --oxblood: #8C1D2F;
+  --brass: #B08D57;
+}
+
+@theme inline {
+  --color-ink: #0E0E0E;
+  --color-paper: #F6F3EE;
+  --color-linen: #E8E2D8;
+  --color-graphite: #5C5852;
+  --color-oxblood: #8C1D2F;
+  --color-brass: #B08D57;
+
+  --font-serif: var(--font-bodoni), 'Bodoni Moda', Georgia, serif;
+  --font-sans: var(--font-jost), 'Jost', system-ui, sans-serif;
+}
+
+body {
+  background-color: var(--paper);
+  color: var(--ink);
+  font-family: var(--font-sans);
+}
+
+.font-serif {
+  font-family: var(--font-serif);
+}
+
+.font-sans {
+  font-family: var(--font-sans);
+}
