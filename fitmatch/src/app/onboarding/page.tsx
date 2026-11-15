@@ -60,9 +60,12 @@ export default function OnboardingPage() {
         if (chart && chart.rows) {
           const labels = chart.rows.map((r: any) => r.label);
           setAvailableSizes(labels);
-          if (labels.length > 0 && !labels.includes(selectedSize)) {
+          if (labels.length > 0 && (!selectedSize || !labels.includes(selectedSize))) {
             setSelectedSize(labels[Math.min(2, labels.length - 1)]);
           }
+        } else {
+          setAvailableSizes([]);
+          setEstimatedPreview(null);
         }
       })
       .catch(console.error);

@@ -18,8 +18,13 @@ export async function GET(req: NextRequest) {
       );
     }
 
-    // Lookup brand by slug or ObjectId
-    let brandDoc = await Brand.findOne({ slug: brand.toLowerCase() }).lean();
+    // Lookup brand by slug, name or ObjectId
+    let brandDoc = await Brand.findOne({
+      $or: [
+        { slug: brand.toLowerCase() },
+        { name: { $regex: new RegExp(`^${brand}$`, 'i') } },
+      ],
+    }).lean();
     if (!brandDoc && brand.match(/^[0-9a-fA-F]{24}$/)) {
       brandDoc = await Brand.findById(brand).lean();
     }

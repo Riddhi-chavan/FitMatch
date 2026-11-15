@@ -6,7 +6,7 @@ import { computeRecommendation } from '@/lib/engine/recommend';
 import { z } from 'zod';
 
 const BatchRecommendSchema = z.object({
-  productIds: z.array(z.string()).min(1).max(50),
+  productIds: z.array(z.string()).max(50),
   profile: ProfileSchema,
 });
 
@@ -21,6 +21,10 @@ export async function POST(req: NextRequest) {
     }
 
     const { productIds, profile } = parsed.data;
+
+    if (productIds.length === 0) {
+      return NextResponse.json({});
+    }
 
     const products = await Product.find({ _id: { $in: productIds } })
       .populate('brandId', 'name slug')

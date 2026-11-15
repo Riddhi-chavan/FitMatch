@@ -22,9 +22,8 @@ export default function HomePage() {
     fetch(`/api/products?gender=${profile.gender}&limit=6`)
       .then((res) => res.json())
       .then((data) => {
-        if (data.products) {
+        if (data.products && data.products.length > 0) {
           setFeatured(data.products);
-          // Request batch recommendations
           const pIds = data.products.map((p: any) => p._id);
           fetch('/api/recommend/batch', {
             method: 'POST',
@@ -34,6 +33,8 @@ export default function HomePage() {
             .then((r) => r.json())
             .then((recs) => setRecommendations(recs))
             .catch(console.error);
+        } else {
+          setFeatured([]);
         }
       })
       .catch(console.error);

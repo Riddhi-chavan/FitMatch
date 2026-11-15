@@ -2,13 +2,22 @@
 
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
+import { signIn } from 'next-auth/react';
+import { useState } from 'react';
 
 export default function LoginPage() {
   const router = useRouter();
+  const [loading, setLoading] = useState(false);
 
-  const handleGoogleLogin = () => {
-    // In dev mode without configured OAuth keys, redirect gracefully to onboarding
-    router.push('/onboarding');
+  const handleGoogleLogin = async () => {
+    setLoading(true);
+    try {
+      await signIn('google', { redirectTo: '/onboarding' });
+    } catch {
+      router.push('/onboarding');
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -22,24 +31,25 @@ export default function LoginPage() {
       <main className="my-auto py-12 space-y-8 text-center">
         <div>
           <span className="text-[10px] uppercase tracking-[0.2em] text-[#8C1D2F] font-semibold">
-            S2 · Member Access
+            Member Access
           </span>
           <h1 className="font-serif text-3xl md:text-4xl text-[#0E0E0E] font-normal mt-1">
-            Welcome to FitMatch
+            Sign in to Find Your Size
           </h1>
           <p className="text-xs text-[#5C5852] mt-2">
-            Save your sizes across devices, or continue with complete anonymity.
+            Continue with Google to personalize your fit recommendations, or proceed as guest.
           </p>
         </div>
 
         <div className="space-y-4 pt-4">
           <button
             type="button"
+            disabled={loading}
             onClick={handleGoogleLogin}
-            className="w-full py-4 bg-white border border-[#0E0E0E] text-[#0E0E0E] text-xs uppercase tracking-[0.2em] font-medium hover:bg-[#E8E2D8] transition-colors flex items-center justify-center gap-3"
+            className="w-full py-4 bg-white border border-[#0E0E0E] text-[#0E0E0E] text-xs uppercase tracking-[0.2em] font-medium hover:bg-[#E8E2D8] transition-colors flex items-center justify-center gap-3 disabled:opacity-50"
           >
             <span className="font-serif font-bold text-sm">G</span>
-            <span>Continue with Google</span>
+            <span>{loading ? 'Connecting...' : 'Continue with Google'}</span>
           </button>
 
           <div className="flex items-center gap-4 my-4">

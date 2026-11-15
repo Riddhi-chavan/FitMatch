@@ -38,7 +38,7 @@ export default function LandingPage() {
         {/* Action Buttons */}
         <div className="flex flex-col sm:flex-row gap-4 w-full sm:w-auto mb-14">
           <Link
-            href="/onboarding"
+            href="/login"
             className="px-8 py-4 bg-[#0E0E0E] text-white text-xs uppercase tracking-[0.2em] font-medium hover:bg-[#8C1D2F] transition-colors"
           >
             Find My Size
@@ -49,22 +49,6 @@ export default function LandingPage() {
           >
             Continue as Guest
           </Link>
-        </div>
-
-        {/* Supported Brands */}
-        <div className="w-full max-w-xl border-t border-b border-[#E8E2D8] py-5 mb-14">
-          <p className="text-[10px] uppercase tracking-[0.2em] text-[#5C5852] mb-3">
-            Calibrated for real size charts
-          </p>
-          <div className="flex justify-center items-center gap-6 sm:gap-10 font-serif text-sm tracking-wider text-[#0E0E0E]">
-            <span className="font-bold">H&amp;M</span>
-            <span>·</span>
-            <span className="font-bold">ZARA</span>
-            <span>·</span>
-            <span className="font-bold">UNIQLO</span>
-            <span>·</span>
-            <span className="font-bold">LEVI&apos;S</span>
-          </div>
         </div>
 
         {/* How It Works (3 Steps) */}
@@ -101,12 +85,9 @@ export default function LandingPage() {
         </div>
       </main>
 
-      {/* Footer / Privacy Assurance */}
+      {/* Footer */}
       <footer className="border-t border-[#E8E2D8] pt-6 flex flex-col sm:flex-row justify-between items-center text-xs text-[#5C5852] gap-2">
-        <div className="flex items-center gap-2">
-          <span className="inline-block w-2 h-2 rounded-full bg-[#8C1D2F]"></span>
-          <span>Privacy first: Camera frames never leave your browser.</span>
-        </div>
+        <span className="text-[11px] uppercase tracking-wider">FitMatch Studio</span>
         <p className="text-[11px] tracking-wider uppercase text-[#5C5852]">
           FitMatch &copy; 2026
         </p>

@@ -1,5 +1,6 @@
 import type { Metadata } from 'next';
 import { Bodoni_Moda, Jost } from 'next/font/google';
+import { Providers } from '@/components/Providers';
 import './globals.css';
 
 const bodoni = Bodoni_Moda({
@@ -27,7 +28,7 @@ export default function RootLayout({
   return (
     <html lang="en" className={`${bodoni.variable} ${jost.variable} h-full antialiased`}>
       <body className="min-h-full flex flex-col bg-[#F6F3EE] text-[#0E0E0E] font-sans selection:bg-[#8C1D2F] selection:text-white">
-        {children}
+        <Providers>{children}</Providers>
       </body>
     </html>
   );

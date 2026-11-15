@@ -30,7 +30,13 @@ export async function POST(req: NextRequest) {
     const estimatedList: Record<string, number>[] = [];
 
     for (const ref of references) {
-      let brandDoc = await Brand.findOne({ slug: ref.brandId.toLowerCase() }).lean();
+      let brandDoc = await Brand.findOne({
+        $or: [
+          { slug: ref.brandId.toLowerCase() },
+          { name: { $regex: new RegExp(`^${ref.brandId}$`, 'i') } },
+        ],
+      }).lean();
+
       if (!brandDoc && ref.brandId.match(/^[0-9a-fA-F]{24}$/)) {
         brandDoc = await Brand.findById(ref.brandId).lean();
       }
