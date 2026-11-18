@@ -1,6 +1,13 @@
 import Link from 'next/link';
+import { redirect } from 'next/navigation';
+import { auth } from '@/auth';
 
-export default function LandingPage() {
+export default async function LandingPage() {
+  const session = await auth();
+  if (session?.user) {
+    redirect('/home');
+  }
+
   return (
     <div className="min-h-screen flex flex-col justify-between px-6 py-8 md:px-16 md:py-12 max-w-5xl mx-auto">
       {/* Top Bar */}

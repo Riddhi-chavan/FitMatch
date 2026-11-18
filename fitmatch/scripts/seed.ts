@@ -173,40 +173,246 @@ async function seed() {
 
   console.log('✅ Size charts: H&M + Zara (Men + Women, jeans & tshirt)');
 
-  // ── PRODUCTS: MEN + WOMEN ─────────────────────────────────
+  // ── PRODUCTS: MEN + WOMEN WITH REAL EDITORIAL IMAGES ───────
   await Product.insertMany([
-    // H&M Men
-    { brandId: hm._id, name: 'Slim Fit Jeans', category: 'jeans', gender: 'men', fitType: 'slim', stretch: false, images: ['/products/hm-slim-jeans.jpg'], active: true },
-    { brandId: hm._id, name: 'Relaxed Fit Jeans', category: 'jeans', gender: 'men', fitType: 'relaxed', stretch: false, images: ['/products/hm-relaxed-jeans.jpg'], active: true },
-    { brandId: hm._id, name: 'Skinny Stretch Jeans', category: 'jeans', gender: 'men', fitType: 'skinny', stretch: true, images: ['/products/hm-skinny-jeans.jpg'], active: true },
-    { brandId: hm._id, name: 'Regular Fit T-shirt', category: 'tshirt', gender: 'men', fitType: 'straight', stretch: false, images: ['/products/hm-regular-tshirt.jpg'], active: true },
-    { brandId: hm._id, name: 'Slim Fit T-shirt', category: 'tshirt', gender: 'men', fitType: 'slim', stretch: false, images: ['/products/hm-slim-tshirt.jpg'], active: true },
-    { brandId: hm._id, name: 'Oversized T-shirt', category: 'tshirt', gender: 'men', fitType: 'relaxed', stretch: false, images: ['/products/hm-oversized-tshirt.jpg'], active: true },
+    // H&M Men's Jeans
+    {
+      brandId: hm._id,
+      name: 'Slim Fit Jeans',
+      category: 'jeans',
+      gender: 'men',
+      fitType: 'slim',
+      stretch: false,
+      images: ['https://images.unsplash.com/photo-1541099649105-f69ad21f3246?auto=format&fit=crop&w=800&q=80'],
+      active: true,
+    },
+    {
+      brandId: hm._id,
+      name: 'Relaxed Fit Jeans',
+      category: 'jeans',
+      gender: 'men',
+      fitType: 'relaxed',
+      stretch: false,
+      images: ['https://images.unsplash.com/photo-1582552938357-32b906df40cb?auto=format&fit=crop&w=800&q=80'],
+      active: true,
+    },
+    {
+      brandId: hm._id,
+      name: 'Skinny Stretch Jeans',
+      category: 'jeans',
+      gender: 'men',
+      fitType: 'skinny',
+      stretch: true,
+      images: ['https://images.unsplash.com/photo-1506629082955-511b1aa562c8?auto=format&fit=crop&w=800&q=80'],
+      active: true,
+    },
 
-    // Zara Men
-    { brandId: zara._id, name: 'Slim Fit Jeans Z01', category: 'jeans', gender: 'men', fitType: 'slim', stretch: false, images: ['/products/zara-slim-jeans.jpg'], active: true },
-    { brandId: zara._id, name: 'Baggy Jeans Z02', category: 'jeans', gender: 'men', fitType: 'baggy', stretch: false, images: ['/products/zara-baggy-jeans.jpg'], active: true },
-    { brandId: zara._id, name: 'Straight Leg Jeans Z03', category: 'jeans', gender: 'men', fitType: 'straight', stretch: false, images: ['/products/zara-straight-jeans.jpg'], active: true },
-    { brandId: zara._id, name: 'Basic Slim T-shirt', category: 'tshirt', gender: 'men', fitType: 'slim', stretch: false, images: ['/products/zara-slim-tshirt.jpg'], active: true },
-    { brandId: zara._id, name: 'Essential White Tee', category: 'tshirt', gender: 'men', fitType: 'straight', stretch: false, images: ['/products/zara-white-tshirt.jpg'], active: true },
-    { brandId: zara._id, name: 'Relaxed Graphic Tee', category: 'tshirt', gender: 'men', fitType: 'relaxed', stretch: false, images: ['/products/zara-graphic-tshirt.jpg'], active: true },
+    // H&M Men's T-Shirts
+    {
+      brandId: hm._id,
+      name: 'Regular Fit T-shirt',
+      category: 'tshirt',
+      gender: 'men',
+      fitType: 'straight',
+      stretch: false,
+      images: ['https://images.unsplash.com/photo-1521572267360-ee0c2909d518?auto=format&fit=crop&w=800&q=80'],
+      active: true,
+    },
+    {
+      brandId: hm._id,
+      name: 'Slim Fit T-shirt',
+      category: 'tshirt',
+      gender: 'men',
+      fitType: 'slim',
+      stretch: false,
+      images: ['https://images.unsplash.com/photo-1583743814966-8936f5b7be1a?auto=format&fit=crop&w=800&q=80'],
+      active: true,
+    },
+    {
+      brandId: hm._id,
+      name: 'Oversized T-shirt',
+      category: 'tshirt',
+      gender: 'men',
+      fitType: 'relaxed',
+      stretch: false,
+      images: ['https://images.unsplash.com/photo-1503342217505-b0a15ec3261c?auto=format&fit=crop&w=800&q=80'],
+      active: true,
+    },
 
-    // H&M Women
-    { brandId: hm._id, name: 'Wide High Jeans', category: 'jeans', gender: 'women', fitType: 'relaxed', stretch: false, images: ['/products/hm-w-wide-jeans.jpg'], active: true },
-    { brandId: hm._id, name: 'Skinny High Waist Jeans', category: 'jeans', gender: 'women', fitType: 'skinny', stretch: true, images: ['/products/hm-w-skinny-jeans.jpg'], active: true },
-    { brandId: hm._id, name: 'Straight Ankle Jeans', category: 'jeans', gender: 'women', fitType: 'straight', stretch: false, images: ['/products/hm-w-straight-jeans.jpg'], active: true },
-    { brandId: hm._id, name: 'Fitted Cotton Tee', category: 'tshirt', gender: 'women', fitType: 'slim', stretch: false, images: ['/products/hm-w-fitted-tee.jpg'], active: true },
-    { brandId: hm._id, name: 'Boxy Crewneck Tee', category: 'tshirt', gender: 'women', fitType: 'relaxed', stretch: false, images: ['/products/hm-w-boxy-tee.jpg'], active: true },
+    // Zara Men's Jeans
+    {
+      brandId: zara._id,
+      name: 'Slim Fit Jeans Z01',
+      category: 'jeans',
+      gender: 'men',
+      fitType: 'slim',
+      stretch: false,
+      images: ['https://images.unsplash.com/photo-1576995853123-5a10305d93c0?auto=format&fit=crop&w=800&q=80'],
+      active: true,
+    },
+    {
+      brandId: zara._id,
+      name: 'Baggy Jeans Z02',
+      category: 'jeans',
+      gender: 'men',
+      fitType: 'baggy',
+      stretch: false,
+      images: ['https://images.unsplash.com/photo-1555689502-c4b22d76c56f?auto=format&fit=crop&w=800&q=80'],
+      active: true,
+    },
+    {
+      brandId: zara._id,
+      name: 'Straight Leg Jeans Z03',
+      category: 'jeans',
+      gender: 'men',
+      fitType: 'straight',
+      stretch: false,
+      images: ['https://images.unsplash.com/photo-1542272604-780c96856592?auto=format&fit=crop&w=800&q=80'],
+      active: true,
+    },
 
-    // Zara Women
-    { brandId: zara._id, name: 'Z1975 High-Rise Straight Jeans', category: 'jeans', gender: 'women', fitType: 'straight', stretch: false, images: ['/products/zara-w-straight-jeans.jpg'], active: true },
-    { brandId: zara._id, name: 'Wide Leg Cropped Jeans', category: 'jeans', gender: 'women', fitType: 'baggy', stretch: false, images: ['/products/zara-w-wide-jeans.jpg'], active: true },
-    { brandId: zara._id, name: 'Slim Fit Flare Jeans', category: 'jeans', gender: 'women', fitType: 'slim', stretch: true, images: ['/products/zara-w-flare-jeans.jpg'], active: true },
-    { brandId: zara._id, name: 'Classic Ribbed T-shirt', category: 'tshirt', gender: 'women', fitType: 'slim', stretch: false, images: ['/products/zara-w-ribbed-tee.jpg'], active: true },
-    { brandId: zara._id, name: 'Oversized Vintage Washed Tee', category: 'tshirt', gender: 'women', fitType: 'relaxed', stretch: false, images: ['/products/zara-w-vintage-tee.jpg'], active: true },
+    // Zara Men's T-Shirts
+    {
+      brandId: zara._id,
+      name: 'Basic Slim T-shirt',
+      category: 'tshirt',
+      gender: 'men',
+      fitType: 'slim',
+      stretch: false,
+      images: ['https://images.unsplash.com/photo-1618354691373-d851c5c3a990?auto=format&fit=crop&w=800&q=80'],
+      active: true,
+    },
+    {
+      brandId: zara._id,
+      name: 'Essential White Tee',
+      category: 'tshirt',
+      gender: 'men',
+      fitType: 'straight',
+      stretch: false,
+      images: ['https://images.unsplash.com/photo-1562157873-818bc0726f68?auto=format&fit=crop&w=800&q=80'],
+      active: true,
+    },
+    {
+      brandId: zara._id,
+      name: 'Relaxed Graphic Tee',
+      category: 'tshirt',
+      gender: 'men',
+      fitType: 'relaxed',
+      stretch: false,
+      images: ['https://images.unsplash.com/photo-1529374255404-311a2a4f1fd9?auto=format&fit=crop&w=800&q=80'],
+      active: true,
+    },
+
+    // H&M Women's Jeans
+    {
+      brandId: hm._id,
+      name: 'Wide High Jeans',
+      category: 'jeans',
+      gender: 'women',
+      fitType: 'relaxed',
+      stretch: false,
+      images: ['https://images.unsplash.com/photo-1584370848010-d7fe6bc767ec?auto=format&fit=crop&w=800&q=80'],
+      active: true,
+    },
+    {
+      brandId: hm._id,
+      name: 'Skinny High Waist Jeans',
+      category: 'jeans',
+      gender: 'women',
+      fitType: 'skinny',
+      stretch: true,
+      images: ['https://images.unsplash.com/photo-1541099649105-f69ad21f3246?auto=format&fit=crop&w=800&q=80'],
+      active: true,
+    },
+    {
+      brandId: hm._id,
+      name: 'Straight Ankle Jeans',
+      category: 'jeans',
+      gender: 'women',
+      fitType: 'straight',
+      stretch: false,
+      images: ['https://images.unsplash.com/photo-1594633312681-425c7b97ccd1?auto=format&fit=crop&w=800&q=80'],
+      active: true,
+    },
+
+    // H&M Women's T-Shirts
+    {
+      brandId: hm._id,
+      name: 'Fitted Cotton Tee',
+      category: 'tshirt',
+      gender: 'women',
+      fitType: 'slim',
+      stretch: false,
+      images: ['https://images.unsplash.com/photo-1554568218-0f1715e72254?auto=format&fit=crop&w=800&q=80'],
+      active: true,
+    },
+    {
+      brandId: hm._id,
+      name: 'Boxy Crewneck Tee',
+      category: 'tshirt',
+      gender: 'women',
+      fitType: 'relaxed',
+      stretch: false,
+      images: ['https://images.unsplash.com/photo-1503342394128-c104d54dba01?auto=format&fit=crop&w=800&q=80'],
+      active: true,
+    },
+
+    // Zara Women's Jeans
+    {
+      brandId: zara._id,
+      name: 'Z1975 High-Rise Straight Jeans',
+      category: 'jeans',
+      gender: 'women',
+      fitType: 'straight',
+      stretch: false,
+      images: ['https://images.unsplash.com/photo-1565084888279-aca607ecce0c?auto=format&fit=crop&w=800&q=80'],
+      active: true,
+    },
+    {
+      brandId: zara._id,
+      name: 'Wide Leg Cropped Jeans',
+      category: 'jeans',
+      gender: 'women',
+      fitType: 'baggy',
+      stretch: false,
+      images: ['https://images.unsplash.com/photo-1517445312882-bc9910d016b7?auto=format&fit=crop&w=800&q=80'],
+      active: true,
+    },
+    {
+      brandId: zara._id,
+      name: 'Slim Fit Flare Jeans',
+      category: 'jeans',
+      gender: 'women',
+      fitType: 'slim',
+      stretch: true,
+      images: ['https://images.unsplash.com/photo-1624378439575-d8705ad7ae80?auto=format&fit=crop&w=800&q=80'],
+      active: true,
+    },
+
+    // Zara Women's T-Shirts
+    {
+      brandId: zara._id,
+      name: 'Classic Ribbed T-shirt',
+      category: 'tshirt',
+      gender: 'women',
+      fitType: 'slim',
+      stretch: false,
+      images: ['https://images.unsplash.com/photo-1618354691373-d851c5c3a990?auto=format&fit=crop&w=800&q=80'],
+      active: true,
+    },
+    {
+      brandId: zara._id,
+      name: 'Oversized Vintage Washed Tee',
+      category: 'tshirt',
+      gender: 'women',
+      fitType: 'relaxed',
+      stretch: false,
+      images: ['https://images.unsplash.com/photo-1576566588028-4147f3842f27?auto=format&fit=crop&w=800&q=80'],
+      active: true,
+    },
   ]);
 
-  console.log('✅ 22 seed products created (Men + Women)');
+  console.log('✅ 22 seed products created with real editorial images (Men + Women)');
   console.log('\n🎉 Seed complete!');
   await mongoose.disconnect();
 }

@@ -18,6 +18,7 @@ function ProductDetailContent({
   const setTryOnBottom = useStore((s) => s.setTryOnBottom);
 
   const [product, setProduct] = useState<any>(null);
+  const [productError, setProductError] = useState<string | null>(null);
   const [result, setResult] = useState<SizeResult | null>(null);
   const [overridePref, setOverridePref] = useState<FitPref>(profile?.fitPref || 'regular');
   const [loading, setLoading] = useState(true);
@@ -27,16 +28,26 @@ function ProductDetailContent({
   // Load product
   useEffect(() => {
     fetch(`/api/products/${id}`)
-      .then((res) => res.json())
-      .then((prod) => {
-        setProduct(prod);
+      .then((res) => {
+        if (!res.ok) throw new Error('Product not found');
+        return res.json();
       })
-      .catch(console.error);
+      .then((prod) => {
+        if (prod && !prod.error) {
+          setProduct(prod);
+        } else {
+          setProductError(prod?.error || 'Product not found');
+        }
+      })
+      .catch((err) => {
+        console.error(err);
+        setProductError('Product not found or unavailable');
+      });
   }, [id]);
 
   // Request recommendation
   useEffect(() => {
-    if (!product) return;
+    if (!product || product.error) return;
 
     // Use stored profile or fallback default guest profile
     const activeProfile = profile || {
@@ -66,6 +77,7 @@ function ProductDetailContent({
   }, [product, id, profile, overridePref]);
 
   const handleTryOn = () => {
+    if (!product?._id) return;
     if (product.category === 'tshirt' || product.category === 'shirt') {
       setTryOnTop(product._id);
     } else {
@@ -73,6 +85,23 @@ function ProductDetailContent({
     }
     router.push('/try-on');
   };
+
+  if (productError) {
+    return (
+      <div className="min-h-screen bg-[#F6F3EE] flex flex-col items-center justify-center p-6 text-center">
+        <span className="font-serif text-3xl text-[#0E0E0E] mb-2">Garment Not Found</span>
+        <p className="text-xs uppercase tracking-widest text-[#5C5852] mb-6">
+          This item may have been updated or removed.
+        </p>
+        <Link
+          href="/products"
+          className="px-6 py-3 bg-[#0E0E0E] text-white text-xs uppercase tracking-[0.2em] font-medium hover:bg-[#8C1D2F] transition-colors"
+        >
+          &larr; Return to Catalog
+        </Link>
+      </div>
+    );
+  }
 
   if (!product) {
     return (
@@ -96,20 +125,33 @@ function ProductDetailContent({
 
       <main className="grid grid-cols-1 md:grid-cols-2 gap-10 items-start flex-1">
         {/* Product Visual */}
-        <div className="bg-white border border-[#E8E2D8] p-8 flex flex-col items-center justify-center">
-          <div className="aspect-3/4 w-full bg-[#E8E2D8] flex flex-col items-center justify-center p-6 text-center">
-            <span className="font-serif text-2xl text-[#0E0E0E]">{product.brandId?.name}</span>
-            <span className="text-xs uppercase tracking-widest text-[#5C5852] mt-1">
-              {product.fitType} Cut
-            </span>
+        <div className="bg-white border border-[#E8E2D8] p-4 md:p-6 flex flex-col items-center justify-center">
+          <div className="aspect-3/4 w-full bg-[#E8E2D8] relative overflow-hidden">
+            {product.images?.[0] ? (
+              <img
+                src={product.images[0]}
+                alt={product.name}
+                className="w-full h-full object-cover object-top"
+              />
+            ) : (
+              <div className="w-full h-full flex flex-col items-center justify-center p-6 text-center">
+                <span className="font-serif text-2xl text-[#0E0E0E]">{product.brandId?.name}</span>
+                <span className="text-xs uppercase tracking-widest text-[#5C5852] mt-1">
+                  {product.fitType} Cut
+                </span>
+              </div>
+            )}
+            <div className="absolute top-3 left-3 bg-[#0E0E0E] text-white text-[10px] uppercase tracking-widest px-2.5 py-1 font-semibold">
+              {product.brandId?.name}
+            </div>
             {product.stretch && (
-              <span className="text-[10px] text-[#8C1D2F] uppercase tracking-wider font-semibold mt-2">
-                Stretch Fabric
-              </span>
+              <div className="absolute bottom-3 left-3 bg-[#8C1D2F] text-white text-[10px] uppercase tracking-widest px-2.5 py-1 font-semibold">
+                Comfort Stretch
+              </div>
             )}
           </div>
-          <span className="text-[11px] uppercase tracking-widest text-[#5C5852] mt-4">
-            Studio Model #FM-{product._id.slice(-4)}
+          <span className="text-[10px] uppercase tracking-widest text-[#5C5852] mt-3 text-center">
+            Studio Model #FM-{product?._id ? product._id.slice(-4) : '0000'} · {product?.fitType ? product.fitType.toUpperCase() : ''} CUT
           </span>
         </div>
 

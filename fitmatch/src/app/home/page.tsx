@@ -228,15 +228,28 @@ export default function HomePage() {
                   href={`/products/${prod._id}`}
                   className="bg-white border border-[#E8E2D8] p-4 flex flex-col justify-between hover:border-[#0E0E0E] transition-all group"
                 >
-                  <div className="aspect-square bg-[#E8E2D8] flex items-center justify-center mb-4 relative overflow-hidden">
-                    <span className="text-[11px] uppercase tracking-[0.2em] text-[#5C5852]">
-                      {prod.brandId?.name || 'Garment'}
-                    </span>
+                  <div className="aspect-3/4 bg-[#E8E2D8] mb-4 relative overflow-hidden">
+                    {prod.images?.[0] ? (
+                      <img
+                        src={prod.images[0]}
+                        alt={prod.name}
+                        className="w-full h-full object-cover object-top transition-transform duration-500 group-hover:scale-105"
+                      />
+                    ) : (
+                      <div className="w-full h-full flex items-center justify-center">
+                        <span className="text-[11px] uppercase tracking-[0.2em] text-[#5C5852]">
+                          {prod.brandId?.name || 'Garment'}
+                        </span>
+                      </div>
+                    )}
                     {rec && 'size' in rec && (
-                      <div className="absolute top-2 right-2 bg-[#0E0E0E] text-white px-2 py-1 text-[10px] uppercase tracking-widest font-bold">
+                      <div className="absolute top-2 right-2 bg-[#0E0E0E] text-white px-2.5 py-1 text-[10px] uppercase tracking-widest font-bold shadow-xs">
                         Size {rec.size}
                       </div>
                     )}
+                    <div className="absolute bottom-2 left-2 bg-white/90 backdrop-blur-xs px-2 py-0.5 text-[9px] uppercase tracking-wider font-semibold text-[#0E0E0E]">
+                      {prod.brandId?.name}
+                    </div>
                   </div>
                   <div>
                     <span className="text-[10px] uppercase tracking-wider text-[#5C5852]">
