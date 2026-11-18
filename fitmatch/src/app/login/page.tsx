@@ -2,19 +2,27 @@
 
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import { signIn } from 'next-auth/react';
-import { useState } from 'react';
+import { signIn, useSession } from 'next-auth/react';
+import { useEffect, useState } from 'react';
 
 export default function LoginPage() {
   const router = useRouter();
+  const { data: session, status: authStatus } = useSession();
   const [loading, setLoading] = useState(false);
+
+  // If already logged in, immediately redirect to home
+  useEffect(() => {
+    if (authStatus === 'authenticated') {
+      router.push('/home');
+    }
+  }, [authStatus, router]);
 
   const handleGoogleLogin = async () => {
     setLoading(true);
     try {
-      await signIn('google', { redirectTo: '/onboarding' });
+      await signIn('google', { redirectTo: '/home' });
     } catch {
-      router.push('/onboarding');
+      router.push('/home');
     } finally {
       setLoading(false);
     }
@@ -37,7 +45,7 @@ export default function LoginPage() {
             Sign in to Find Your Size
           </h1>
           <p className="text-xs text-[#5C5852] mt-2">
-            Continue with Google to personalize your fit recommendations, or proceed as guest.
+            Continue with Google to personalize your fit recommendations across devices, or proceed as guest.
           </p>
         </div>
 
@@ -65,7 +73,7 @@ export default function LoginPage() {
             Continue as Guest
           </Link>
           <span className="text-[10px] text-[#5C5852] block">
-            Guests keep their profile only for this session.
+            Guests keep their profile saved locally on this device.
           </span>
         </div>
       </main>

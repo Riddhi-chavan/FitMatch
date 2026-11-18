@@ -1,19 +1,49 @@
 'use client';
 
-import { useState, useEffect } from 'react';
-import { useRouter } from 'next/navigation';
+import { Suspense, useState, useEffect } from 'react';
+import { useRouter, useSearchParams } from 'next/navigation';
 import Link from 'next/link';
+import { useSession } from 'next-auth/react';
 import { useStore } from '@/store';
 import type { Category, FitPref, Gender, Profile } from '@/types';
 
-export default function OnboardingPage() {
+function OnboardingContent() {
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const isEditing = searchParams.get('edit') === 'true';
+  const { data: session, status: authStatus } = useSession();
+
+  const currentStoreProfile = useStore((s) => s.profile);
   const setStoreProfile = useStore((s) => s.setProfile);
+
+  // If returning user and not in explicit edit mode, redirect straight to home
+  useEffect(() => {
+    if (isEditing) return;
+
+    // 1. If profile already in local store
+    if (currentStoreProfile && Object.keys(currentStoreProfile.measurements || {}).length > 0) {
+      router.push('/home');
+      return;
+    }
+
+    // 2. If logged in with Google, check cloud profile in MongoDB
+    if (authStatus === 'authenticated') {
+      fetch('/api/me/profile')
+        .then((res) => (res.ok ? res.json() : null))
+        .then((data) => {
+          if (data?.profile) {
+            setStoreProfile(data.profile);
+            router.push('/home');
+          }
+        })
+        .catch(console.error);
+    }
+  }, [isEditing, currentStoreProfile, authStatus, router, setStoreProfile]);
 
   // Step management (1: method & gender, 2: details, 3: preference & privacy)
   const [step, setStep] = useState<1 | 2 | 3>(1);
   const [method, setMethod] = useState<'reference' | 'measurements'>('reference');
-  const [gender, setGender] = useState<Gender>('men');
+  const [gender, setGender] = useState<Gender>(currentStoreProfile?.gender || 'men');
 
   // S4A: Reference size state
   const [brands, setBrands] = useState<{ _id: string; name: string; slug: string }[]>([]);
@@ -25,16 +55,16 @@ export default function OnboardingPage() {
 
   // S4B: Measurements state
   const [unit, setUnit] = useState<'cm' | 'in'>('cm');
-  const [waist, setWaist] = useState<string>('82');
-  const [hip, setHip] = useState<string>('97');
-  const [inseam, setInseam] = useState<string>('80');
-  const [chest, setChest] = useState<string>('94');
-  const [shoulder, setShoulder] = useState<string>('46');
-  const [height, setHeight] = useState<string>('175');
-  const [weight, setWeight] = useState<string>('72');
+  const [waist, setWaist] = useState<string>(currentStoreProfile?.measurements?.waist?.toString() || '82');
+  const [hip, setHip] = useState<string>(currentStoreProfile?.measurements?.hip?.toString() || '97');
+  const [inseam, setInseam] = useState<string>(currentStoreProfile?.measurements?.inseam?.toString() || '80');
+  const [chest, setChest] = useState<string>(currentStoreProfile?.measurements?.chest?.toString() || '94');
+  const [shoulder, setShoulder] = useState<string>(currentStoreProfile?.measurements?.shoulder?.toString() || '46');
+  const [height, setHeight] = useState<string>(currentStoreProfile?.measurements?.height?.toString() || '175');
+  const [weight, setWeight] = useState<string>(currentStoreProfile?.measurements?.weight?.toString() || '72');
 
   // S5: Fit Preference & Privacy
-  const [fitPref, setFitPref] = useState<FitPref>('regular');
+  const [fitPref, setFitPref] = useState<FitPref>(currentStoreProfile?.fitPref || 'regular');
   const [saveProfile, setSaveProfile] = useState<boolean>(true);
   const [loading, setLoading] = useState(false);
 
@@ -94,7 +124,7 @@ export default function OnboardingPage() {
       .catch(console.error);
   }, [method, selectedBrandSlug, refCategory, selectedSize, gender, brands]);
 
-  const handleFinishOnboarding = () => {
+  const handleFinishOnboarding = async () => {
     setLoading(true);
     let finalMeasurements: Record<string, number> = {};
 
@@ -125,6 +155,20 @@ export default function OnboardingPage() {
     };
 
     setStoreProfile(profile);
+
+    // If logged in with Google (or saveProfile is selected), sync profile to MongoDB!
+    if (session?.user && saveProfile) {
+      try {
+        await fetch('/api/me/profile', {
+          method: 'PUT',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(profile),
+        });
+      } catch (err) {
+        console.error('Failed to sync profile to cloud:', err);
+      }
+    }
+
     router.push('/home');
   };
 
@@ -381,101 +425,114 @@ export default function OnboardingPage() {
           </div>
         )}
 
-        {/* STEP 2B: Direct Measurements */}
+        {/* STEP 2B: Direct Measurements (CM / IN Spacing Fixed) */}
         {step === 2 && method === 'measurements' && (
-          <div className="space-y-4">
-            <div className="flex justify-between items-center">
+          <div className="space-y-6">
+            <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4 pb-3 border-b border-[#E8E2D8]">
               <div>
-                <span className="text-[10px] uppercase tracking-[0.2em] text-[#8C1D2F] font-semibold">
+                <span className="text-[10px] uppercase tracking-[0.2em] text-[#8C1D2F] font-semibold block mb-1">
                   Step 2: Exact Measures
                 </span>
-                <h2 className="font-serif text-2xl font-normal text-[#0E0E0E]">
+                <h2 className="font-serif text-2xl sm:text-3xl font-normal text-[#0E0E0E]">
                   Your Body Measurements
                 </h2>
               </div>
-              <div className="flex border border-[#E8E2D8]">
-                <button
-                  type="button"
-                  onClick={() => setUnit('cm')}
-                  className={`px-3 py-1 text-xs uppercase ${unit === 'cm' ? 'bg-[#0E0E0E] text-white' : 'bg-white'}`}
-                >
-                  cm
-                </button>
-                <button
-                  type="button"
-                  onClick={() => setUnit('in')}
-                  className={`px-3 py-1 text-xs uppercase ${unit === 'in' ? 'bg-[#0E0E0E] text-white' : 'bg-white'}`}
-                >
-                  in
-                </button>
+              <div className="flex items-center gap-2 self-start sm:self-auto shrink-0">
+                <span className="text-[10px] uppercase tracking-wider text-[#5C5852] font-semibold">
+                  Unit:
+                </span>
+                <div className="flex border border-[#0E0E0E] bg-white">
+                  <button
+                    type="button"
+                    onClick={() => setUnit('cm')}
+                    className={`px-3.5 py-1.5 text-xs font-bold uppercase transition-colors ${
+                      unit === 'cm'
+                        ? 'bg-[#0E0E0E] text-white'
+                        : 'bg-white text-[#5C5852] hover:text-[#0E0E0E]'
+                    }`}
+                  >
+                    cm
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setUnit('in')}
+                    className={`px-3.5 py-1.5 text-xs font-bold uppercase transition-colors ${
+                      unit === 'in'
+                        ? 'bg-[#0E0E0E] text-white'
+                        : 'bg-white text-[#5C5852] hover:text-[#0E0E0E]'
+                    }`}
+                  >
+                    in
+                  </button>
+                </div>
               </div>
             </div>
 
-            <div className="grid grid-cols-2 gap-3">
+            <div className="grid grid-cols-2 gap-4">
               <div>
-                <label className="text-[10px] uppercase tracking-wider text-[#5C5852] block mb-1">
+                <label className="text-[10px] uppercase tracking-wider text-[#5C5852] block mb-1.5 font-medium">
                   Waist * (Jeans)
                 </label>
                 <input
                   type="number"
                   value={waist}
                   onChange={(e) => setWaist(e.target.value)}
-                  className="w-full p-2.5 bg-white border border-[#E8E2D8] text-xs"
+                  className="w-full p-3 bg-white border border-[#E8E2D8] text-sm text-[#0E0E0E] focus:outline-none focus:border-[#0E0E0E]"
                 />
               </div>
               <div>
-                <label className="text-[10px] uppercase tracking-wider text-[#5C5852] block mb-1">
+                <label className="text-[10px] uppercase tracking-wider text-[#5C5852] block mb-1.5 font-medium">
                   Hip * (Jeans)
                 </label>
                 <input
                   type="number"
                   value={hip}
                   onChange={(e) => setHip(e.target.value)}
-                  className="w-full p-2.5 bg-white border border-[#E8E2D8] text-xs"
+                  className="w-full p-3 bg-white border border-[#E8E2D8] text-sm text-[#0E0E0E] focus:outline-none focus:border-[#0E0E0E]"
                 />
               </div>
               <div>
-                <label className="text-[10px] uppercase tracking-wider text-[#5C5852] block mb-1">
+                <label className="text-[10px] uppercase tracking-wider text-[#5C5852] block mb-1.5 font-medium">
                   Chest * (Tops)
                 </label>
                 <input
                   type="number"
                   value={chest}
                   onChange={(e) => setChest(e.target.value)}
-                  className="w-full p-2.5 bg-white border border-[#E8E2D8] text-xs"
+                  className="w-full p-3 bg-white border border-[#E8E2D8] text-sm text-[#0E0E0E] focus:outline-none focus:border-[#0E0E0E]"
                 />
               </div>
               <div>
-                <label className="text-[10px] uppercase tracking-wider text-[#5C5852] block mb-1">
+                <label className="text-[10px] uppercase tracking-wider text-[#5C5852] block mb-1.5 font-medium">
                   Inseam
                 </label>
                 <input
                   type="number"
                   value={inseam}
                   onChange={(e) => setInseam(e.target.value)}
-                  className="w-full p-2.5 bg-white border border-[#E8E2D8] text-xs"
+                  className="w-full p-3 bg-white border border-[#E8E2D8] text-sm text-[#0E0E0E] focus:outline-none focus:border-[#0E0E0E]"
                 />
               </div>
               <div>
-                <label className="text-[10px] uppercase tracking-wider text-[#5C5852] block mb-1">
+                <label className="text-[10px] uppercase tracking-wider text-[#5C5852] block mb-1.5 font-medium">
                   Height (cm)
                 </label>
                 <input
                   type="number"
                   value={height}
                   onChange={(e) => setHeight(e.target.value)}
-                  className="w-full p-2.5 bg-white border border-[#E8E2D8] text-xs"
+                  className="w-full p-3 bg-white border border-[#E8E2D8] text-sm text-[#0E0E0E] focus:outline-none focus:border-[#0E0E0E]"
                 />
               </div>
               <div>
-                <label className="text-[10px] uppercase tracking-wider text-[#5C5852] block mb-1">
+                <label className="text-[10px] uppercase tracking-wider text-[#5C5852] block mb-1.5 font-medium">
                   Weight (kg)
                 </label>
                 <input
                   type="number"
                   value={weight}
                   onChange={(e) => setWeight(e.target.value)}
-                  className="w-full p-2.5 bg-white border border-[#E8E2D8] text-xs"
+                  className="w-full p-3 bg-white border border-[#E8E2D8] text-sm text-[#0E0E0E] focus:outline-none focus:border-[#0E0E0E]"
                 />
               </div>
             </div>
@@ -543,7 +600,7 @@ export default function OnboardingPage() {
                   className="mt-0.5 accent-[#8C1D2F]"
                 />
                 <span className="text-xs text-[#0E0E0E]">
-                  <strong>Save encrypted profile:</strong> Kept safely for quick recommendations across visits.
+                  <strong>Save encrypted profile:</strong> Kept safely in your account for instant recommendations.
                 </span>
               </label>
 
@@ -556,7 +613,7 @@ export default function OnboardingPage() {
                   className="mt-0.5 accent-[#8C1D2F]"
                 />
                 <span className="text-xs text-[#5C5852]">
-                  <strong>Session only:</strong> Discard all body measurements when I close this browser.
+                  <strong>This device only:</strong> Discard cloud storage and keep profile only on this browser.
                 </span>
               </label>
             </div>
@@ -575,7 +632,7 @@ export default function OnboardingPage() {
                 onClick={handleFinishOnboarding}
                 className="w-2/3 py-4 bg-[#8C1D2F] text-white text-xs uppercase tracking-[0.2em] font-medium hover:bg-[#0E0E0E] transition-colors"
               >
-                {loading ? 'Calculating...' : 'Show My Sizes'}
+                {loading ? 'Saving...' : 'Show My Sizes'}
               </button>
             </div>
           </div>
@@ -586,5 +643,19 @@ export default function OnboardingPage() {
         FitMatch · Studio Atelier
       </footer>
     </div>
+  );
+}
+
+export default function OnboardingPage() {
+  return (
+    <Suspense
+      fallback={
+        <div className="min-h-screen bg-[#F6F3EE] flex items-center justify-center text-xs uppercase tracking-widest text-[#5C5852]">
+          Loading onboarding...
+        </div>
+      }
+    >
+      <OnboardingContent />
+    </Suspense>
   );
 }

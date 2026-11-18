@@ -2,19 +2,30 @@
 
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
+import { useSession, signOut } from 'next-auth/react';
 import { useStore } from '@/store';
 
 export default function ProfilePage() {
   const router = useRouter();
+  const { data: session } = useSession();
   const profile = useStore((s) => s.profile);
   const clearProfile = useStore((s) => s.clearProfile);
 
-  const handleDeleteData = () => {
+  const handleDeleteData = async () => {
     if (confirm('Are you sure you want to delete all stored profile data? This cannot be undone.')) {
       clearProfile();
+      try {
+        await fetch('/api/me/profile', { method: 'DELETE' });
+      } catch (err) {
+        console.error('Failed to delete cloud profile:', err);
+      }
       alert('Profile data cleared.');
       router.push('/');
     }
+  };
+
+  const handleSignOut = async () => {
+    await signOut({ callbackUrl: '/' });
   };
 
   return (
@@ -29,14 +40,41 @@ export default function ProfilePage() {
       </header>
 
       <main className="space-y-8 flex-1">
-        <div>
-          <span className="text-[10px] uppercase tracking-[0.2em] text-[#8C1D2F] font-semibold">
-            S13 · Account &amp; Data
-          </span>
-          <h1 className="font-serif text-3xl md:text-4xl text-[#0E0E0E] font-normal mt-1">
-            Fit Profile &amp; Privacy
-          </h1>
+        <div className="flex justify-between items-end">
+          <div>
+            <span className="text-[10px] uppercase tracking-[0.2em] text-[#8C1D2F] font-semibold">
+              S13 · Account &amp; Data
+            </span>
+            <h1 className="font-serif text-3xl md:text-4xl text-[#0E0E0E] font-normal mt-1">
+              Fit Profile &amp; Privacy
+            </h1>
+          </div>
+          {session?.user && (
+            <button
+              type="button"
+              onClick={handleSignOut}
+              className="text-xs uppercase tracking-wider text-[#5C5852] hover:text-[#8C1D2F] pb-1 border-b border-transparent hover:border-[#8C1D2F]"
+            >
+              Sign Out
+            </button>
+          )}
         </div>
+
+        {session?.user && (
+          <div className="bg-white border border-[#E8E2D8] px-6 py-4 flex items-center justify-between">
+            <div>
+              <span className="text-[10px] uppercase tracking-wider text-[#5C5852] block">
+                Google Account
+              </span>
+              <span className="text-xs font-semibold text-[#0E0E0E]">
+                {session.user.name} ({session.user.email})
+              </span>
+            </div>
+            <span className="text-[10px] uppercase tracking-widest text-[#8C1D2F] font-bold px-2 py-0.5 bg-[#8C1D2F]/10">
+              Cloud Synced
+            </span>
+          </div>
+        )}
 
         {profile ? (
           <div className="bg-white border border-[#E8E2D8] p-6 space-y-6">
@@ -50,10 +88,10 @@ export default function ProfilePage() {
                 </span>
               </div>
               <Link
-                href="/onboarding"
+                href="/onboarding?edit=true"
                 className="px-3 py-1.5 border border-[#0E0E0E] text-[11px] uppercase tracking-wider hover:bg-[#0E0E0E] hover:text-white transition-colors"
               >
-                Re-take Onboarding
+                Edit Measurements
               </Link>
             </div>
 
